@@ -15,6 +15,7 @@ namespace Site.Acme.Controllers
             return View();
         }
 
+        [Menu("Outros", 9999, "Ajuda", "Sobre")]
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
@@ -22,6 +23,7 @@ namespace Site.Acme.Controllers
             return View();
         }
 
+        [Menu("Outros", 9999, "Ajuda", "Contato")]
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";
