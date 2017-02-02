@@ -1,0 +1,16 @@
+﻿@model Wee.Common.Contracts.IMenuItem
+
+@if (Model.RouteName.StartsWith("$"))
+{
+    <a asp-controller="@Model.ControllerName" asp-action="@Model.ActionName" class="animsition-link"  data-placement="top" data-toggle="tooltip" data-original-title="@Model.Hint">
+        <i class="site-menu-icon @Model.Icon" aria-hidden="true"></i>
+        <span class="site-menu-title">@Model.Title</span>
+    </a>
+}
+else
+{
+    <a asp-route="@Model.RouteName" class="animsition-link" data-placement="top" data-toggle="tooltip" data-original-title="@Model.Hint">
+        <i class="site-menu-icon @Model.Icon" aria-hidden="true"></i>
+        <span class="site-menu-title">@Model.Title</span>
+    </a>
+}

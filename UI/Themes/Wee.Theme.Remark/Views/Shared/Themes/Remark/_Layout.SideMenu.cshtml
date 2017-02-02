@@ -1,0 +1,52 @@
+﻿@*@inject AweAppTenant Tenant;*@
+@{
+    Layout = "Themes/Remark/_Layout";
+}
+
+@section styles{
+
+    <link rel="stylesheet" href="/wwwroot/themes/remark/classic/base/assets/css/site.min.css" />
+
+    @*@if (!string.IsNullOrWhiteSpace(Tenant.Skin) || !Tenant.Skin.Equals("default", StringComparison.OrdinalIgnoreCase))
+    {
+        var skin = $"{Tenant.Skin}.css";
+        <link rel="stylesheet" href="/wwwroot/themes/remark/classic/base/assets/skins/@skin" />
+    }*@
+
+    @RenderSection("styles", required: false)
+
+}
+
+@section head_scripts{
+    @RenderSection("head_scripts", required: false)
+}
+
+@RenderBody()
+
+
+@section scripts{
+
+    <script src="/wwwroot/themes/remark/classic/base/assets/js/Section/Menubar.js"></script>
+    <script src="/wwwroot/themes/remark/classic/base/assets/js/Section/GridMenu.js"></script>
+    <script src="/wwwroot/themes/remark/classic/base/assets/js/Section/Sidebar.js"></script>
+    <script src="/wwwroot/themes/remark/classic/base/assets/js/Section/PageAside.js"></script>
+    <script src="/wwwroot/themes/remark/classic/base/assets/js/Plugin/menu.js"></script>
+
+    <script>
+        Config.set('assets', '/wwwroot/themes/remark/classic/base/assets');
+    </script>
+
+    <script src="/wwwroot/themes/remark/classic/base/assets/js/Site.js"></script>
+    <script>
+        (function (document, window, $) {
+            'use strict';
+            var Site = window.Site;
+            $(document).ready(function () {
+                Site.run();
+            });
+        })(document, window, jQuery);
+    </script>
+
+    @RenderSection("scripts", required: false)
+
+}

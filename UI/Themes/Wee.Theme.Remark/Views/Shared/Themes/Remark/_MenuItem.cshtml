@@ -1,0 +1,32 @@
+﻿@model List<Wee.Common.Contracts.IMenuItem>
+
+@foreach (var subMenu in Model)
+{
+    var hasChildren = subMenu.Children.Count > 0;
+    var itemClass = hasChildren ? "has-sub" : string.Empty;
+
+    <li class="site-menu-item @itemClass">
+        @if (hasChildren)
+        {
+            <a href="javascript:void(0)">
+                <span class="site-menu-title">
+                    @subMenu.Title
+                </span>
+                <span class="site-menu-arrow"></span>
+            </a>
+
+            <ul class="site-menu-sub">
+                @foreach (var item in subMenu.Children)
+                {
+                    <li class="site-menu-item">
+                        @{await Html.RenderPartialAsync("Themes/Remark/_MenuItemLink", item);}
+                    </li>
+                            }
+            </ul>
+                            }
+                            else
+                            {
+                                await Html.RenderPartialAsync("Themes/Remark/_MenuItemLink", subMenu);
+                            }
+    </li>
+                            }

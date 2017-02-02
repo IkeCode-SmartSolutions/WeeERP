@@ -1,0 +1,95 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+@section styles{
+    <link rel="stylesheet" href="/wwwroot/themes/remark/classic/global/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/wwwroot/themes/remark/classic/global/css/bootstrap-extend.min.css" />
+
+    <link rel="stylesheet" href="/wwwroot/themes/remark/classic/global/vendor/animsition/animsition.css">
+    <link rel="stylesheet" href="/wwwroot/themes/remark/classic/global/vendor/asscrollable/asScrollable.css">
+    <link rel="stylesheet" href="/wwwroot/themes/remark/classic/global/vendor/switchery/switchery.css">
+    <link rel="stylesheet" href="/wwwroot/themes/remark/classic/global/vendor/slidepanel/slidePanel.css">
+    <link rel="stylesheet" href="/wwwroot/themes/remark/classic/global/vendor/flagiconcss/flag-icon.css">
+
+    <link rel="stylesheet" href="/wwwroot/themes/remark/classic/global/fonts/webicons/web-icons.css">
+    <link rel="stylesheet" href="/wwwroot/themes/remark/classic/global/fonts/brandicons/brandicons.css">
+
+    <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,300italic'>
+
+    @RenderSection("styles", required: false)
+}
+
+@section head_scripts{
+
+    <!--[if lt IE 9]>
+      <script src="/wwwroot/themes/remark/classic/global/vendor/html5shiv/html5shiv.min.js"></script>
+    <![endif]-->
+    <!--[if lt IE 10]>
+      <script src="/wwwroot/themes/remark/classic/global/vendor/media-match/media.match.min.js"></script>
+      <script src="/wwwroot/themes/remark/classic/global/vendor/respond/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="/wwwroot/themes/remark/classic/global/vendor/breakpoints/breakpoints.js"></script>
+    <script>
+        Breakpoints();
+    </script>
+
+    @RenderSection("head_scripts", required: false)
+}
+
+@{ await Html.RenderPartialAsync("Themes/Remark/_Header"); }
+
+<div class="page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">Page Title</h1>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="active breadcrumb-item">Pagina</li>
+        </ol>
+    </div>
+    <!-- End Page Header -->
+    <!-- Page Content -->
+    <div class="page-content">
+        <!-- Panel -->
+        <div class="panel">
+            <div class="panel-heading">
+                <h3 class="panel-title">Panel Title</h3>
+            </div>
+            <div class="panel-body">
+                @RenderBody()
+            </div>
+        </div>
+        <!-- End Panel -->
+    </div>
+    <!-- End Page Content -->
+</div>
+
+
+@{ await Html.RenderPartialAsync("Themes/Remark/_Menu"); }
+
+@section scripts{
+
+    <script src="/wwwroot/themes/remark/classic/global/vendor/babelexternalhelpers/babel-external-helpers.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/vendor/jquery/jquery.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/vendor/tether/tether.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/vendor/bootstrap/bootstrap.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/vendor/animsition/animsition.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/vendor/mousewheel/jquery.mousewheel.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/vendor/asscrollbar/jquery-asScrollbar.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/vendor/asscrollable/jquery-asScrollable.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/vendor/ashoverscroll/jquery-asHoverScroll.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/vendor/screenfull/screenfull.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/vendor/slidepanel/jquery-slidePanel.js"></script>
+
+    <script src="/wwwroot/themes/remark/classic/global/js/State.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/js/Component.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/js/Plugin.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/js/Base.js"></script>
+    <script src="/wwwroot/themes/remark/classic/global/js/Config.js"></script>
+
+    <script src="/wwwroot/themes/remark/classic/global/js/config/colors.js"></script>
+
+    @RenderSection("scripts", required: false)
+}

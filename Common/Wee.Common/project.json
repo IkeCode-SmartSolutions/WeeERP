@@ -1,0 +1,23 @@
+﻿{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "Microsoft.DotNet.PlatformAbstractions": "1.1.0",
+    "Microsoft.Extensions.DependencyModel": "1.1.0",
+    "System.Reflection": "4.3.0",
+    "System.Runtime.Loader": "4.3.0",
+    "System.Security.Cryptography.Algorithms": "4.3.0",
+    "System.Text.Encoding": "4.3.0"
+  },
+  "Microsoft.NETCore.App": {
+    "version": "1.0.1",
+    "type": "platform"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": [
+        "dotnet5.6",
+        "portable-net45+win8"
+      ]
+    }
+  }
+}
