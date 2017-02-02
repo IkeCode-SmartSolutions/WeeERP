@@ -10,6 +10,7 @@ namespace Wee.Common
         private string _category;
         private int? _categoryOrder;
         private string _parent;
+        private string _parentIcon;
         private string _title;
         private int _order;
         private string _icon;
@@ -24,9 +25,10 @@ namespace Wee.Common
         /// <param name="hint">Help text on mouse over, if null or empty assumes Title</param>
         /// <param name="order">Position on related parent children list</param>
         /// <param name="icon">Menu icon</param>
-        public MenuAttribute(string parent, string title, string hint = "", int order = 0, string icon = "")
+        public MenuAttribute(string parent, string parentIcon, string title, string hint = "", int order = 0, string icon = "")
         {
             _parent = parent;
+            _parentIcon = parentIcon;
             _title = title;
             _order = order;
             _icon = icon;
@@ -42,8 +44,8 @@ namespace Wee.Common
         /// <param name="hint">Help text on mouse over, if null or empty assumes Title</param>
         /// <param name="order">Position on related parent children list</param>
         /// <param name="icon">Menu icon</param>
-        public MenuAttribute(string category, int categoryOrder, string parent, string title, string hint = "", int order = 0, string icon = "")
-            : this(parent, title, hint, order, icon)
+        public MenuAttribute(string category, int categoryOrder, string parent, string parentIcon, string title, string hint = "", int order = 0, string icon = "")
+            : this(parent, parentIcon, title, hint, order, icon)
         {
             _category = category;
             _categoryOrder = categoryOrder;
@@ -54,6 +56,8 @@ namespace Wee.Common
         public int? CategoryOrder { get { return _categoryOrder; } }
 
         public string Parent { get { return _parent; } }
+
+        public string ParentIcon { get { return _parentIcon; } }
 
         public string Title { get { return _title; } }
 

@@ -32,7 +32,7 @@ namespace Wee.UI.Core.Services
             //Adiciona os parents como item de menu, é apenas um "holder" pros filhos e evita de ter que criar [MenuAttribute] só pra isso.
             if (!string.IsNullOrWhiteSpace(menu.Parent) && !RegisteredMenus[menuCategory].Any(i => i.Title == menu.Parent))
             {
-                RegisteredMenus[menuCategory].Add(new MenuItem() { Title = menu.Parent });
+                RegisteredMenus[menuCategory].Add(new MenuItem() { Title = menu.Parent, ParentIcon = menu.ParentIcon });
             }
         }
 

@@ -4,23 +4,59 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-@if (SignInManager.IsSignedIn(User))
-{
-    <form asp-area="" asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm" class="navbar-right">
-        <ul class="nav navbar-nav navbar-right">
-            <li>
-                <a asp-area="" asp-controller="Manage" asp-action="Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-            </li>
-            <li>
-                <button type="submit" class="btn btn-link navbar-btn navbar-link">Log off</button>
-            </li>
-        </ul>
-    </form>
-}
-else
-{
-    <ul class="nav navbar-nav navbar-right">
-        <li><a asp-area="" asp-controller="Account" asp-action="Register">Register</a></li>
-        <li><a asp-area="" asp-controller="Account" asp-action="Login">Log in</a></li>
-    </ul>
-}
+<div>
+
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <form asp-area="" asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm" class="navbar-right">
+            <a class="nav-link navbar-avatar" data-toggle="dropdown" href="#" aria-expanded="false" data-animation="scale-up" role="button">
+                <span class="avatar avatar-online">
+                    <img src="/wwwroot/themes/remark/classic/global/portraits/5.jpg" alt="@UserManager.GetUserName(User)">
+                    <i></i>
+                </span>
+            </a>
+            <div class="dropdown-menu" role="menu">
+                <h5 class="dropdown-item">
+                    Olá @UserManager.GetUserName(User)!
+                </h5>
+                <a class="dropdown-item" href="javascript:void(0)" role="menuitem"><i class="icon wb-user" aria-hidden="true"></i> Perfil</a>
+                <a class="dropdown-item" href="javascript:void(0)" role="menuitem"><i class="icon wb-payment" aria-hidden="true"></i> Carteira</a>
+                <a class="dropdown-item" href="javascript:void(0)" role="menuitem"><i class="icon wb-settings" aria-hidden="true"></i> Configurações</a>
+                <div class="dropdown-divider" role="presentation"></div>
+                <button type="submit" class="dropdown-item"><i class="icon fa-sign-out" aria-hidden="true"></i> Logout</button>
+            </div>
+
+            @*<ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a asp-area="" asp-controller="Manage" asp-action="Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+                    </li>
+                    <li>
+                        <button type="submit" class="btn btn-link navbar-btn navbar-link">Log off</button>
+                    </li>
+                </ul>*@
+        </form>
+    }
+    else
+    {
+        @*<ul class="nav navbar-nav navbar-right">
+            <li><a asp-area="" asp-controller="Account" asp-action="Register">Register</a></li>
+            <li><a asp-area="" asp-controller="Account" asp-action="Login">Log in</a></li>
+        </ul>*@
+
+        <a class="nav-link navbar-avatar" data-toggle="dropdown" href="#" aria-expanded="false" data-animation="scale-up" role="button">
+            <span class="avatar avatar-online">
+                <img src="/wwwroot/themes/remark/classic/global/portraits/5.jpg" alt="@UserManager.GetUserName(User)">
+                <i></i>
+            </span>
+        </a>
+        <div class="dropdown-menu" role="menu">
+            <h5 class="dropdown-item">
+                Olá <i>Visitante</i>!
+            </h5>
+            <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Register" role="menuitem"><i class="icon wb-user" aria-hidden="true"></i> Registrar</a>
+            <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Login" role="menuitem"><i class="icon fa-sign-in" aria-hidden="true"></i> Entrar</a>
+            
+        </div>
+    }
+
+</div>

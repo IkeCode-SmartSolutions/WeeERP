@@ -8,6 +8,7 @@ namespace Wee.Common.Contracts
     public interface IMenuItem
     {
         string Parent { get; set; }
+        string ParentIcon { get; set; }
         string Title { get; set; }
         string Hint { get; set; }
         int Order { get; set; }

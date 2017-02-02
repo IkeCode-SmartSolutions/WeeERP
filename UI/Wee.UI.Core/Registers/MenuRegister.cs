@@ -80,11 +80,11 @@ namespace Wee.UI.Core.Registers
 
                             if (routeAttr == null)
                             {
-                                menu = new MenuItem(controller.Name, method.Name, menuAttr.Parent, menuAttr.Title, menuAttr.Hint, menuAttr.Order, menuAttr.Icon);
+                                menu = new MenuItem(controller.Name, method.Name, menuAttr.Parent, menuAttr.ParentIcon, menuAttr.Title, menuAttr.Hint, menuAttr.Order, menuAttr.Icon);
                             }
                             else
                             {
-                                menu = new MenuItem(routeAttr.Name, menuAttr.Parent, menuAttr.Title, menuAttr.Hint, menuAttr.Order, menuAttr.Icon);
+                                menu = new MenuItem(routeAttr.Name, menuAttr.Parent, menuAttr.ParentIcon, menuAttr.Title, menuAttr.Hint, menuAttr.Order, menuAttr.Icon);
                             }
 
                             var categoryOrder = module?.Order ?? menuAttr.CategoryOrder ?? 9999;
