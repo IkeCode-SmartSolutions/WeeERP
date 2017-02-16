@@ -15,17 +15,17 @@ namespace Wee.UI.Core.Registers
     /// <summary>
     /// 
     /// </summary>
-    internal sealed class StaticFilesRegister : BaseFileProvidersRegister, IWeeRegister<IApplicationBuilder>
+    internal sealed class StaticFilesRegister : BaseFileProvidersRegister<IApplicationBuilder>
     {
-        private IApplicationBuilder _app;
+        private readonly IApplicationBuilder _app;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="folderPath"></param>
-        public StaticFilesRegister(IApplicationBuilder app, string folderPath)
-            : base(folderPath)
+        /// <param name="assembliesPath"></param>
+        public StaticFilesRegister(IApplicationBuilder app, string assembliesPath)
+            : base(assembliesPath)
         {
             _app = app;
         }
@@ -35,8 +35,7 @@ namespace Wee.UI.Core.Registers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public IApplicationBuilder Invoke<T>()
-            where T : class
+        public override IApplicationBuilder Invoke<T>()
         {
             var providers = base.LoadProviders<T>();
 

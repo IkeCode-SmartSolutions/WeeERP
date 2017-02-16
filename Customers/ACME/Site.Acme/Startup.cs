@@ -39,7 +39,10 @@ namespace Site.Acme
 
         public IConfigurationRoot Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// </summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
@@ -49,19 +52,20 @@ namespace Site.Acme
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-
-            services.WeeRegisterPackages();
-
-            services.AddSingleton<IMenuService, MenuService>();
-
-            services.AddMvc();
-
+            
+            services.WeePackagesRegister();
+            
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
+        /// <param name="loggerFactory"></param>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
@@ -79,7 +83,8 @@ namespace Site.Acme
             }
 
             app.UseStaticFiles();
-            app.WeeRegisterPackages();
+            
+            app.WeePackagesRegister();
 
             app.UseIdentity();
 

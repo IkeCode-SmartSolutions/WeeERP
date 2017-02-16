@@ -5,9 +5,14 @@ using System.Threading.Tasks;
 
 namespace Wee.Common.Contracts
 {
-    public interface IWeeRegister<TExtensionReturnType>
+    public interface IWeeRegister<TExtensionReturnType> : IWeeRegister
     {
         TExtensionReturnType Invoke<T>()
             where T : class;
+    }
+
+    public interface IWeeRegister
+    {
+        string AssembliesPath { get; }
     }
 }

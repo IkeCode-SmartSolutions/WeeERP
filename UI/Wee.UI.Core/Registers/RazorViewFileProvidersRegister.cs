@@ -14,17 +14,17 @@ namespace Wee.UI.Core.Registers
     /// <summary>
     /// 
     /// </summary>
-    internal sealed class RazorViewFileProvidersRegister : BaseFileProvidersRegister, IWeeRegister<IServiceCollection>
+    internal sealed class RazorViewFileProvidersRegister : BaseFileProvidersRegister<IServiceCollection>
     {
-        private IServiceCollection _serviceCollection;
+        private readonly IServiceCollection _serviceCollection;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="serviceCollection"></param>
-        /// <param name="folderPath"></param>
-        public RazorViewFileProvidersRegister(IServiceCollection serviceCollection, string folderPath)
-            : base(folderPath)
+        /// <param name="assembliesPath"></param>
+        public RazorViewFileProvidersRegister(IServiceCollection serviceCollection, string assembliesPath)
+            : base(assembliesPath)
         {
             _serviceCollection = serviceCollection;
         }
@@ -34,8 +34,7 @@ namespace Wee.UI.Core.Registers
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public IServiceCollection Invoke<T>()
-            where T : class
+        public override IServiceCollection Invoke<T>()
         {
             var providers = base.LoadProviders<T>();
 

@@ -20,7 +20,8 @@
     "Microsoft.AspNetCore.Http.Abstractions": "1.1.0",
     "Microsoft.AspNetCore.StaticFiles": "1.1.0",
     "System.Reflection": "4.3.0",
-    "Wee.UI.Core.Services": "1.0.0-*"
+    "Wee.UI.Core.Services": "1.0.0-*",
+    "Microsoft.AspNetCore.Mvc": "1.1.0"
   },
 
   "tools": {

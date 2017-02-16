@@ -12,20 +12,20 @@ namespace Wee.UI.Core.Registers
     /// <summary>
     /// 
     /// </summary>
-    internal sealed class ThemeRegister : IWeeRegister<IServiceCollection>
+    internal sealed class PackageServicesRegister : IWeeRegister<IServiceCollection>
     {
-        private IServiceCollection _serviceCollection;
-        private string _folderPath;
+        private readonly IServiceCollection _serviceCollection;
+        public string AssembliesPath { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="serviceCollection"></param>
-        /// <param name="folderPath"></param>
-        public ThemeRegister(IServiceCollection serviceCollection, string folderPath)
+        /// <param name="assembliesPath"></param>
+        public PackageServicesRegister(IServiceCollection serviceCollection, string assembliesPath)
         {
             _serviceCollection = serviceCollection;
-            _folderPath = folderPath;
+            AssembliesPath = assembliesPath;
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Wee.UI.Core.Registers
         public IServiceCollection Invoke<T>()
             where T : class
         {
-            var types = AssemblyTools.LoadTypesThatImplements<T>(_folderPath);
+            var types = AssemblyTools.LoadTypesThatImplements<T>(AssembliesPath);
 
             var ctorTypes = new Type[] { typeof(IServiceCollection) };
             var packageType = typeof(IWeePackage);
@@ -49,11 +49,15 @@ namespace Wee.UI.Core.Registers
                 if (isServiceCollectionConstructor)
                 {
                     args = new object[] { _serviceCollection };
-                }
 
-                var instance = type.CreateInstance<T>(args);
-                if (packageType.IsAssignableFrom(instance.GetType()))
-                    (instance as IWeePackage)?.RegisterServices();
+                    var instance = type.CreateInstance<T>(args);
+                    if (packageType.IsAssignableFrom(instance.GetType()))
+                        (instance as IWeePackage)?.RegisterServices();
+                }
+                else
+                {
+                    throw new NotSupportedException("IWeePackage implementations must to have a constructor with IServiceCollection parameter. (e.g. ctor(IServiceCollection serviceCollection) {...} )");
+                }
             }
 
             return _serviceCollection;

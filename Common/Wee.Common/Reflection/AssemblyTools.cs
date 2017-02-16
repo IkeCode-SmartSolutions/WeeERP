@@ -22,79 +22,99 @@ namespace Wee.Common.Reflection
             return attr != null ? attr.DefaultNamespace : string.Empty;
         }
 
-        private static string GetCacheKey(string folderPath, bool ignoreSystemAssemblies = true, params string[] ignoredAssemblies)
+        private static string GetCacheKey(string assembliesPath, bool ignoreSystemAssemblies = true, params string[] ignoredAssemblies)
         {
             var cacheKey = string.Empty;
 
-            var ignoredString = string.Join(",", ignoredAssemblies);
+            var ignoredString = ignoredAssemblies != null ? string.Join(",", ignoredAssemblies) : "";
 
-            var result = $"{folderPath}_{ignoredAssemblies}_{ignoredString}";
+            var result = $"{assembliesPath}_{ignoreSystemAssemblies}_{ignoredString}";
 
             cacheKey = CryptoTools.CalculateMD5Hash(result);
 
             return cacheKey;
         }
 
-        public static IEnumerable<Assembly> LoadAssemblies(string folderPath, bool ignoreSystemAssemblies = true, params string[] ignoredAssemblies)
+        private static List<Assembly> AssembliesLoader(string assembliesPath, string cacheKey, IEnumerable<AssemblyName> assemblyNames)
         {
-            var cacheKey = GetCacheKey(folderPath, ignoreSystemAssemblies, ignoredAssemblies);
+            var result = new List<Assembly>();
+
+            var asl = new AssemblyLoader(assembliesPath);
+
+            foreach (var asmName in assemblyNames)
+            {
+                var assembly = asl.LoadFromAssemblyName(asmName);
+
+                result.Add(assembly);
+            }
+
+            _assembliesCache[cacheKey] = result;
+
+            return result;
+        }
+
+        public static List<Assembly> LoadAssemblies(string assembliesPath, Func<AssemblyName, bool> predicate = null, bool ignoreSystemAssemblies = true, params string[] ignoredAssemblies)
+        {
+            var cacheKey = GetCacheKey(assembliesPath, ignoreSystemAssemblies, ignoredAssemblies);
+            var result = new List<Assembly>();
 
             if (_assembliesCache.ContainsKey(cacheKey))
             {
-                foreach (var cached in _assembliesCache[cacheKey])
-                {
-                    yield return cached;
-                }
+                return _assembliesCache[cacheKey];
             }
             else
             {
                 _assembliesCache[cacheKey] = new List<Assembly>();
 
                 var runtimeId = RuntimeEnvironment.GetRuntimeIdentifier();
-                var assemblieNames = DependencyContext.Default.GetRuntimeAssemblyNames(runtimeId);
+                var assemblyNames = DependencyContext.Default.GetRuntimeAssemblyNames(runtimeId);
 
                 if (ignoreSystemAssemblies)
                 {
-                    assemblieNames = assemblieNames
+                    assemblyNames = assemblyNames
                                     .Where(asm => _ignoredSystemAssemblies
-                                                        .All(sysName => !asm.Name.StartsWith(sysName, StringComparison.CurrentCultureIgnoreCase))
+                                                        .All(sysName => !asm.Name.StartsWith(sysName, StringComparison.OrdinalIgnoreCase))
                                           );
                 }
 
-                if (ignoredAssemblies.Length > 0)
+                if (ignoredAssemblies?.Length > 0)
                 {
-                    assemblieNames = assemblieNames
+                    assemblyNames = assemblyNames
                                     .Where(asm => _ignoredSystemAssemblies
-                                                        .All(sysName => !asm.Name.Equals(sysName, StringComparison.CurrentCultureIgnoreCase))
+                                                        .All(sysName => !asm.Name.Equals(sysName, StringComparison.OrdinalIgnoreCase))
                                           );
                 }
 
-                if (assemblieNames.Count() == 0)
-                    yield break;
-
-                var asl = new AssemblyLoader(folderPath);
-
-                foreach (var asmName in assemblieNames)
+                if (predicate != null)
                 {
-                    var assembly = asl.LoadFromAssemblyName(asmName);
-
-                    _assembliesCache[cacheKey].Add(assembly);
-
-                    yield return assembly;
+                    assemblyNames = assemblyNames.Where(predicate);
                 }
+
+                if (assemblyNames.Count() == 0)
+                    return result;
+
+                result = AssembliesLoader(assembliesPath, cacheKey, assemblyNames);
             }
+            return result;
         }
 
-        public static IEnumerable<Assembly> LoadAssembliesThatImplements<T>(string folderPath, bool ignoreSystemAssemblies = true, params string[] ignoredAssemblies)
+        public static IEnumerable<Assembly> LoadAssembliesThatImplements<T>(string assembliesPath,
+                                                                            Func<AssemblyName, bool> assembliesPredicate = null,
+                                                                            bool ignoreSystemAssemblies = true,
+                                                                            string[] ignoredAssemblies = null,
+                                                                            Func<Type, bool> typesPredicate = null)
         {
             var type = typeof(T);
 
             var result = new List<Assembly>();
 
-            foreach (var asm in LoadAssemblies(folderPath, ignoreSystemAssemblies, ignoredAssemblies))
+            var assemblies = LoadAssemblies(assembliesPath, assembliesPredicate, ignoreSystemAssemblies, ignoredAssemblies);
+
+            var p = (new List<Func<Type, bool>>(typesPredicate) { i => !i.GetTypeInfo().IsInterface && type.IsAssignableFrom(i) }).ToArray();
+
+            foreach (var asm in assemblies)
             {
-                var moduleTypes = asm.GetTypes().Where(a => !a.GetTypeInfo().IsInterface
-                                                             && type.IsAssignableFrom(a));
+                var moduleTypes = asm.LoadTypesThatImplements<T>(p);
 
                 var isAssignable = moduleTypes != null && moduleTypes.Count() > 0;
 
@@ -107,67 +127,90 @@ namespace Wee.Common.Reflection
             return result;
         }
 
-        public static IEnumerable<Type> LoadTypesThatImplements<T>(string folderPath)
+        public static IEnumerable<Type> LoadTypesThatImplements<T>(string assembliesPath,
+                                                                   Func<AssemblyName, bool> assembliesPredicate = null,
+                                                                   bool ignoreSystemAssemblies = true,
+                                                                   string[] ignoredAssemblies = null,
+                                                                   params Func<Type, bool>[] typesPredicate)
         {
-            var assemblies = LoadAssembliesThatImplements<T>(folderPath);
-
-            return assemblies.LoadTypesThatImplements<T>();
+            var assemblies = LoadAssembliesThatImplements<T>(assembliesPath, assembliesPredicate, ignoreSystemAssemblies, ignoredAssemblies, typesPredicate);
+            
+            return assemblies.LoadTypesThatImplements<T>(typesPredicate);
         }
 
-        public static IEnumerable<Type> LoadTypesThatImplements<T>(this IEnumerable<Assembly> assemblies)
+        public static IEnumerable<Type> LoadTypesThatImplements<T>(this IEnumerable<Assembly> assemblies,
+                                                                   params Func<Type, bool>[] predicates)
         {
             var result = new List<Type>();
-
-            foreach (var asm in assemblies)
-            {
-                var asmTypes = asm.LoadTypesThatImplements<T>();
-                result.AddRange(asmTypes);
-            }
-
-            return result;
-        }
-
-        public static IEnumerable<Type> LoadTypesThatImplements<T>(this Assembly assembly)
-        {
             var type = typeof(T);
-            var result = assembly
-                                .GetTypes()
-                                .Where(i => !type.IsConstructedGenericType
-                                         && type.IsAssignableFrom(i))
-                                .ToList();
-            return result;
-        }
-
-        public static IEnumerable<Type> LoadTypesThatImplementsGenericType(string folderPath, Type genericType)
-        {
-            var assemblies = LoadAssemblies(folderPath);
-
-            return assemblies.LoadTypesThatImplementsGenericType(genericType);
-        }
-
-        public static IEnumerable<Type> LoadTypesThatImplementsGenericType(this IEnumerable<Assembly> assemblies, Type genericType)
-        {
-            var result = new List<Type>();
-
-            var types = assemblies.SelectMany(i => i.GetTypes()).ToList();
 
             foreach (var asm in assemblies)
             {
-                var asmTypes = asm.LoadTypesThatImplementsGenericType(genericType);
+                var asmTypes = asm.LoadTypesThatImplements<T>(predicates);
                 result.AddRange(asmTypes);
             }
 
             return result;
         }
 
-        public static IEnumerable<Type> LoadTypesThatImplementsGenericType(this Assembly assembly, Type genericType)
+        public static IEnumerable<Type> LoadTypesThatImplements<T>(this Assembly assembly,
+                                                                   params Func<Type, bool>[] predicates)
+        {
+            return LoadTypesThatImplements(assembly, typeof(T), predicates);
+        }
+
+        public static IEnumerable<Type> LoadTypesThatImplements(this Assembly assembly,
+                                                                Type type,
+                                                                params Func<Type, bool>[] predicates)
+        {
+            List<Type> result = new List<Type>();
+            var allTypes = assembly.GetTypes();
+
+            var p = (new List<Func<Type, bool>>(predicates) { i => !type.IsConstructedGenericType && type.IsAssignableFrom(i) }).ToArray();
+
+            foreach (var predicate in p)
+            {
+                var filtered = allTypes.Where(predicate);
+                result.AddRange(filtered);
+            }
+            
+            return result;
+        }
+
+        public static IEnumerable<Type> LoadTypesThatImplementsGenericType(string assembliesPath, Type genericType, params Func<Type, bool>[] predicates)
+        {
+            var assemblies = LoadAssemblies(assembliesPath);
+
+            return assemblies.LoadTypesThatImplementsGenericType(genericType, predicates);
+        }
+
+        public static IEnumerable<Type> LoadTypesThatImplementsGenericType(this IEnumerable<Assembly> assemblies, Type genericType, params Func<Type, bool>[] predicates)
+        {
+            var result = new List<Type>();
+
+            foreach (var asm in assemblies)
+            {
+                var asmTypes = asm.LoadTypesThatImplementsGenericType(genericType, predicates);
+                result.AddRange(asmTypes);
+            }
+
+            return result;
+        }
+
+        public static IEnumerable<Type> LoadTypesThatImplementsGenericType(this Assembly assembly, Type genericType, params Func<Type, bool>[] predicates)
         {
             var result = assembly
-                                .GetTypes()
-                                .Where(t => t.GetTypeInfo().ImplementedInterfaces
+                                .GetTypes().ToList();
+
+            var p = (new List<Func<Type, bool>>(predicates) { t => t.GetTypeInfo().ImplementedInterfaces
                                                                 .Where(i => i.IsConstructedGenericType
-                                                                         && i.GetGenericTypeDefinition() == genericType).SingleOrDefault() != null
-                                      ).ToList();
+                                                                         && i.GetGenericTypeDefinition() == genericType).SingleOrDefault() != null }).ToArray();
+
+            foreach (var predicate in p)
+            {
+                result.Where(predicate);
+            }
+
             return result;
         }
 

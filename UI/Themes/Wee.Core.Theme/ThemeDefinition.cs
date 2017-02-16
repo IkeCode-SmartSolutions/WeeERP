@@ -5,14 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Wee.Common.Contracts;
 using Wee.Common;
+using Wee.UI.Core.Services;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 [assembly: DefaultNamespace("Wee.Core.Theme")]
 namespace Wee.Core.Theme
 {
-    public class PackageDefinition : IWeeTheme
+    public class ThemeDefinition : IWeeTheme
     {
         private readonly IServiceCollection _services;
-        public PackageDefinition(IServiceCollection services)
+        public ThemeDefinition(IServiceCollection services)
         {
             _services = services;
         }
@@ -31,6 +33,7 @@ namespace Wee.Core.Theme
 
         public void RegisterServices()
         {
+            _services.TryAddSingleton<IMenuService, MenuService>();
         }
     }
 }

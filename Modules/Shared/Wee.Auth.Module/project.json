@@ -1,5 +1,5 @@
 {
-  "userSecretsId": "aspnet-Site.Acme-9e1d3511-b003-4c1b-97fd-e33fe107d2cd",
+  "userSecretsId": "aspnet-Wee.Auth.Module-e4a3d8d7-19ca-4399-b742-2994d69491fd",
 
   "dependencies": {
     "Microsoft.NETCore.App": {
@@ -44,9 +44,10 @@
       "version": "1.0.0-preview2-final",
       "type": "build"
     },
-    "Wee.Theme.Remark": "1.0.0-*",
-    "Wee.Core.Theme": "1.0.0-*",
-    "Wee.Auth.Module": "1.0.0-*"
+    "Wee.UI.Core": "1.0.0-*",
+    "Wee.Common": "1.0.0-*",
+    "Microsoft.AspNetCore.Http.Abstractions": "1.1.0",
+    "Microsoft.AspNetCore.Mvc.Core": "1.1.0"
   },
 
   "tools": {
@@ -74,7 +75,11 @@
 
   "buildOptions": {
     "emitEntryPoint": true,
-    "preserveCompilationContext": true
+    "preserveCompilationContext": true,
+    "embed": [
+      "Views/**/*",
+      "wwwroot/**/*"
+    ]
   },
 
   "runtimeOptions": {

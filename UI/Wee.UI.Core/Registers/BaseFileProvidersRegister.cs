@@ -14,18 +14,21 @@ namespace Wee.UI.Core.Registers
     /// <summary>
     /// 
     /// </summary>
-    internal class BaseFileProvidersRegister
+    internal abstract class BaseFileProvidersRegister<TExtensionReturnType> : IWeeRegister<TExtensionReturnType>
     {
-        protected string _folderPath;
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="folderPath"></param>
-        public BaseFileProvidersRegister(string folderPath)
+        public BaseFileProvidersRegister(string assembliesPath)
         {
-            _folderPath = folderPath;
+            AssembliesPath = assembliesPath;
         }
+
+        public string AssembliesPath { get; private set; }
+
+        public abstract TExtensionReturnType Invoke<T>() 
+            where T : class;
 
         /// <summary>
         /// 
@@ -34,7 +37,7 @@ namespace Wee.UI.Core.Registers
         /// <returns></returns>
         protected List<IFileProvider> LoadProviders<T>()
         {
-            var moduleAsms = AssemblyTools.LoadAssembliesThatImplements<T>(_folderPath);
+            var moduleAsms = AssemblyTools.LoadAssembliesThatImplements<T>(AssembliesPath);
 
             var providers = new List<IFileProvider>();
 

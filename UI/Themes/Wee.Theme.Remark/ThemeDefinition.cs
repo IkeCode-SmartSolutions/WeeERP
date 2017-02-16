@@ -11,10 +11,10 @@ using Wee.Common;
 [assembly: DefaultNamespace("Wee.Theme.Remark")]
 namespace Wee.Theme.Remark
 {
-    public class PackageDefinition : IWeeTheme
+    public class ThemeDefinition : IWeeTheme
     {
         private readonly IServiceCollection _services;
-        public PackageDefinition(IServiceCollection services)
+        public ThemeDefinition(IServiceCollection services)
         {
             _services = services;
         }

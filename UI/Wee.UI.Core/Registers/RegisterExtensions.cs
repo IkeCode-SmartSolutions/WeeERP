@@ -20,20 +20,57 @@ namespace Wee.UI.Core
         /// 
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="folderPath"></param>
+        /// <param name="assembliesPath"></param>
         /// <returns></returns>
-        public static IApplicationBuilder WeeRegisterPackages(this IApplicationBuilder app, string folderPath = "")
+        public static IApplicationBuilder WeePackagesRegister(this IApplicationBuilder app, string assembliesPath = "")
         {
-            if (string.IsNullOrWhiteSpace(folderPath))
-                folderPath = PlatformServices.Default.Application.ApplicationBasePath;
+            if (string.IsNullOrWhiteSpace(assembliesPath))
+                assembliesPath = PlatformServices.Default.Application.ApplicationBasePath;
 
-            var instance = new StaticFilesRegister(app, folderPath);            
+            var instance = new StaticFilesRegister(app, assembliesPath);            
             instance.Invoke<IWeePackage>();
 
-            var menuInstance = new MenuRegister(app, folderPath);
+            var menuInstance = new MenuRegister(app, assembliesPath);
             menuInstance.Invoke<Controller>();
 
             return app;
+        }
+
+        public static IMvcBuilder WeePackagesRegister(this IMvcBuilder mvcBuilder, string assembliesPath = "")
+        {
+            if (string.IsNullOrWhiteSpace(assembliesPath))
+                assembliesPath = PlatformServices.Default.Application.ApplicationBasePath;
+
+            var razorViewInstance = new MvcRegister(mvcBuilder, assembliesPath);
+            razorViewInstance.Invoke<IWeePackage>();
+
+            return mvcBuilder;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="assembliesPath"></param>
+        /// <returns></returns>
+        public static IServiceCollection WeePackagesRegister(this IServiceCollection services, string assembliesPath = "")
+        {
+            if (string.IsNullOrWhiteSpace(assembliesPath))
+                assembliesPath = PlatformServices.Default.Application.ApplicationBasePath;
+
+            services.WeeRegisterRegisters();
+
+            var razorViewInstance = new RazorViewFileProvidersRegister(services, assembliesPath);
+            razorViewInstance.Invoke<IWeePackage>();
+
+            var themeInstance = new PackageServicesRegister(services, assembliesPath);
+            themeInstance.Invoke<IWeePackage>();
+            
+            services
+                .AddMvc()
+                .WeePackagesRegister();
+
+            return services;
         }
 
         /// <summary>
@@ -42,16 +79,16 @@ namespace Wee.UI.Core
         /// <param name="services"></param>
         /// <param name="folderPath"></param>
         /// <returns></returns>
-        public static IServiceCollection WeeRegisterPackages(this IServiceCollection services, string folderPath = "")
+        private static IServiceCollection WeeRegisterRegisters(this IServiceCollection services)
         {
-            if (string.IsNullOrWhiteSpace(folderPath))
-                folderPath = PlatformServices.Default.Application.ApplicationBasePath;
-
-            var razorViewInstance = new RazorViewFileProvidersRegister(services, folderPath);
-            razorViewInstance.Invoke<IWeePackage>();
-
-            var themeInstance = new ThemeRegister(services, folderPath);
-            themeInstance.Invoke<IWeePackage>();
+            var assembliesPath = PlatformServices.Default.Application.ApplicationBasePath;
+            
+            var types = Common.Reflection.AssemblyTools.LoadTypesThatImplements<IWeePackage>(assembliesPath, null
+                                );
+            foreach (var t in types)
+            {
+                services.AddSingleton(t, t);
+            }
 
             return services;
         }
